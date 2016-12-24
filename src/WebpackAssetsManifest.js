@@ -36,7 +36,8 @@ function WebpackAssetsManifest(options)
     fileExtRegex: /\.\w{2,4}\.(?:map|gz)$|\.\w+$/i,
     sortManifest: true,
     merge: false,
-    publicPath: ''
+    publicPath: '',
+    ignoreFileName: /\.map\.js$/,
   };
 
   this.options = pick(
@@ -191,7 +192,17 @@ WebpackAssetsManifest.prototype.processAssets = function(assets)
 
     for ( var i = 0, l = filenames.length; i < l ; ++i ) {
       var filename = name + this.getExtension( filenames[ i ] );
-      this.set( filename, filenames[ i ] );
+      var realFileName = filenames[ i ];
+
+      if (this.options.ignoreFileName) {
+        if (this.options.ignoreFileName.test(realFileName)) {
+          realFileName = null;
+        }
+      }
+
+      if (realFileName) {
+        this.set( filename, realFileName );
+      }
     }
   }
 
